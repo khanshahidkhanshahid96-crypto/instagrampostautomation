@@ -1,20 +1,25 @@
 const C = {
   HF: 'YOUR_HF_TOKEN',
-  IG: 'YOUR_INSTAGRAM_BUSSINESS_ACCOUNT',
-  FB: 'YOUR_FACEBOOK_ACCESS_TOKEN'
-  
+  IG: 'YOUR_INSTAGRAM_BUSSINESS_ACCOUNT_ID',
+  FB: 'YOUR_FACEBOOK_TOKEN'
 };
 
+// The specific model version you requested
+const MODEL_ID = "deepseek-ai/DeepSeek-V4-Pro:novita";
+
 /**
- * 1. Researches a trending topic.
+ * 1. Researches a trending topic using DeepSeek-V4-Pro.
  */
 function getDeepSeekResearch(query) {
   const url = "https://router.huggingface.co/v1/chat/completions";
   const prompt = `Research a specific trending news item for "${query}". Provide a concise one-sentence title.`;
 
   const payload = {
-    model: "deepseek-ai/DeepSeek-V3",
-    messages: [{ role: "system", content: "You are a tech news researcher." }, { role: "user", content: prompt }],
+    model: MODEL_ID,
+    messages: [
+      { role: "system", content: "You are a tech news researcher." },
+      { role: "user", content: prompt }
+    ],
     max_tokens: 60
   };
 
@@ -39,7 +44,7 @@ function getDeepSeekResearch(query) {
 }
 
 /**
- * 2. Focuses on the LOGO and recognizable SYMBOLS for image generation.
+ * 2. Focuses on the LOGO using DeepSeek-V4-Pro.
  */
 function getDeepSeekVisualPrompt(topic) {
   const url = "https://router.huggingface.co/v1/chat/completions";
@@ -49,7 +54,7 @@ The logo should be made of premium materials like glowing glass or neon.
 STRICTLY NO TEXT, NO LETTERS. Just the visual logo/icon.`;
 
   const payload = {
-    model: "deepseek-ai/DeepSeek-V3",
+    model: MODEL_ID,
     messages: [
       { role: "system", content: "You are a professional graphic designer." },
       { role: "user", content: prompt }
@@ -78,15 +83,18 @@ STRICTLY NO TEXT, NO LETTERS. Just the visual logo/icon.`;
 }
 
 /**
- * 3. Generates the detailed Instagram caption.
+ * 3. Generates the Instagram caption using DeepSeek-V4-Pro.
  */
 function getDeepSeekDescription(topic) {
   const url = "https://router.huggingface.co/v1/chat/completions";
   const prompt = `Topic: "${topic}". Write a professional Instagram caption explaining why this is important. Use emojis and 5 hashtags.`;
 
   const payload = {
-    model: "deepseek-ai/DeepSeek-V3",
-    messages: [{ role: "system", content: "You are an expert tech influencer." }, { role: "user", content: prompt }]
+    model: MODEL_ID,
+    messages: [
+      { role: "system", content: "You are an expert tech influencer." },
+      { role: "user", content: prompt }
+    ]
   };
 
   const options = {
@@ -106,11 +114,10 @@ function getDeepSeekDescription(topic) {
       return json.choices[0].message.content;
     } else {
       Logger.log("Description API Error: " + resText);
-      return `Exciting news about ${topic}! 🚀 The tech world is evolving fast. Stay tuned for more updates. #TechNews #Coding #Developer #Innovation #Software`;
+      return `Exciting news about ${topic}! 🚀 #TechNews #Coding #Developer #Innovation #Software`;
     }
   } catch (e) {
-    Logger.log("Description Fetch Exception: " + e.toString());
-    return `Updates in ${topic}! 💻 Check out the latest trends in the industry. #Tech #Programming #CodingLife #WebDev #TechTrends`;
+    return `Updates in ${topic}! 💻 #Tech #Programming #CodingLife #WebDev #TechTrends`;
   }
 }
 
