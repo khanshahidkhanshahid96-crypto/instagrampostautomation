@@ -1,22 +1,27 @@
 const C = {
-  HF: 'YOUR_HF_TOKEN',
-  IG: 'YOUR_INSTAGRAM_BUSSINESS_ACCOUNT_ID',
-  FB: 'YOUR_FACEBOOK_TOKEN'
+  HF: 'YOUR_HUGGINGFACE_TOKEN',
+  IG: 'YOUR INSTAGRAM_BUSINESS_ACCOUNT',
+  FB: 'YOUR FACEBOOK TOKEN ID'
 };
 
-// The specific model version you requested
-const MODEL_ID = "deepseek-ai/DeepSeek-V4-Pro:novita";
+
+
+// Switching to the highly stable DeepSeek-V3 model
+const MODEL_ID = "deepseek-ai/DeepSeek-V3";
+
+// We can safely use the standard HF router now, 
+// as V3 is fully recognized as a chat model by the Hub
+const HF_ROUTER_URL = "https://router.huggingface.co/v1/chat/completions"; 
 
 /**
- * 1. Researches a trending topic using DeepSeek-V4-Pro.
+ * 1. Researches a trending topic using DeepSeek-V3.
  */
 function getDeepSeekResearch(query) {
-  const url = "https://router.huggingface.co/v1/chat/completions";
   const prompt = `Research a specific trending news item for "${query}". Provide a concise one-sentence title.`;
 
   const payload = {
     model: MODEL_ID,
-    messages: [
+    messages:[
       { role: "system", content: "You are a tech news researcher." },
       { role: "user", content: prompt }
     ],
@@ -32,22 +37,23 @@ function getDeepSeekResearch(query) {
   };
 
   try {
-    const response = UrlFetchApp.fetch(url, options);
+    const response = UrlFetchApp.fetch(HF_ROUTER_URL, options);
     const json = JSON.parse(response.getContentText());
     if (json.choices && json.choices.length > 0) {
       return json.choices[0].message.content.trim();
     }
+    Logger.log("Research API Error: " + response.getContentText());
     return "New JavaScript Features Released";
   } catch (e) {
+    Logger.log("Research Exception: " + e.toString());
     return "New JavaScript Features Released";
   }
 }
 
 /**
- * 2. Focuses on the LOGO using DeepSeek-V4-Pro.
+ * 2. Focuses on the LOGO using DeepSeek-V3.
  */
 function getDeepSeekVisualPrompt(topic) {
-  const url = "https://router.huggingface.co/v1/chat/completions";
   const prompt = `Topic: "${topic}". Identify the main logo or symbol associated with this tech.
 Describe a high-quality, professional 3D render where that specific LOGO is the central focus.
 The logo should be made of premium materials like glowing glass or neon.
@@ -55,7 +61,7 @@ STRICTLY NO TEXT, NO LETTERS. Just the visual logo/icon.`;
 
   const payload = {
     model: MODEL_ID,
-    messages: [
+    messages:[
       { role: "system", content: "You are a professional graphic designer." },
       { role: "user", content: prompt }
     ],
@@ -71,27 +77,28 @@ STRICTLY NO TEXT, NO LETTERS. Just the visual logo/icon.`;
   };
 
   try {
-    const response = UrlFetchApp.fetch(url, options);
+    const response = UrlFetchApp.fetch(HF_ROUTER_URL, options);
     const json = JSON.parse(response.getContentText());
     if (json.choices && json.choices.length > 0) {
       return json.choices[0].message.content.trim();
     }
+    Logger.log("Visual Prompt API Error: " + response.getContentText());
     return "The iconic yellow JavaScript logo shield, 3D glass render, 8k resolution.";
   } catch (e) {
+    Logger.log("Visual Prompt Exception: " + e.toString());
     return "The iconic yellow JavaScript logo shield, 3D glass render, 8k resolution.";
   }
 }
 
 /**
- * 3. Generates the Instagram caption using DeepSeek-V4-Pro.
+ * 3. Generates the Instagram caption using DeepSeek-V3.
  */
 function getDeepSeekDescription(topic) {
-  const url = "https://router.huggingface.co/v1/chat/completions";
   const prompt = `Topic: "${topic}". Write a professional Instagram caption explaining why this is important. Use emojis and 5 hashtags.`;
 
   const payload = {
     model: MODEL_ID,
-    messages: [
+    messages:[
       { role: "system", content: "You are an expert tech influencer." },
       { role: "user", content: prompt }
     ]
@@ -106,7 +113,7 @@ function getDeepSeekDescription(topic) {
   };
 
   try {
-    const response = UrlFetchApp.fetch(url, options);
+    const response = UrlFetchApp.fetch(HF_ROUTER_URL, options);
     const resText = response.getContentText();
     const json = JSON.parse(resText);
     
@@ -117,6 +124,7 @@ function getDeepSeekDescription(topic) {
       return `Exciting news about ${topic}! 🚀 #TechNews #Coding #Developer #Innovation #Software`;
     }
   } catch (e) {
+    Logger.log("Description Exception: " + e.toString());
     return `Updates in ${topic}! 💻 #Tech #Programming #CodingLife #WebDev #TechTrends`;
   }
 }
@@ -125,7 +133,7 @@ function getDeepSeekDescription(topic) {
  * Main function to run the process.
  */
 function run() {
-  const queries = ['JavaScript coding news 2025', 'Python programming updates', 'React framework news', 'Next.js 15 features', 'AI engineering tools'];
+  const queries =['JavaScript coding news 2026', 'Python programming updates', 'React framework news', 'Next.js features', 'AI engineering tools'];
   const q = queries[Math.floor(Math.random() * queries.length)];
 
   // 1. Research Topic
